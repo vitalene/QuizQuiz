@@ -37,10 +37,22 @@
     NSString *question = self.questions[self.currentQuestionIndex];
     self.questionLabel.text = question;
     self.answerLabel.text = @"???";
+    [self animatedLabelTransitions];
 }
 - (IBAction)showAnswer:(id)sender  {
     NSString *answer = self.answers[self.currentQuestionIndex];
     self.answerLabel.text = answer;
+}
+
+-(void)animatedLabelTransitions {
+    [UIView animateWithDuration:0.5 animations:^{
+        self.questionLabel.alpha = 1.0;
+    }];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    self.questionLabel.alpha = 0.0;
 }
 
 
