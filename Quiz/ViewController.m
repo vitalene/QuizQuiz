@@ -5,11 +5,14 @@
 #import "ViewController.h"
 
 @interface ViewController ()
-@property (nonatomic) IBOutlet UILabel *questionLabel;
+@property (nonatomic) IBOutlet UILabel *currentQuestionLabel;
+@property (nonatomic) IBOutlet UILabel *nextQuestionLabel;
 @property (nonatomic) IBOutlet UILabel *answerLabel;
 @property (nonatomic) NSArray *questions;
 @property (nonatomic) NSArray *answers;
 @property (nonatomic) int currentQuestionIndex;
+@property (nonatomic) IBOutlet NSLayoutConstraint *currentQuestionLabelCenterXConstraint;
+@property (nonatomic) IBOutlet NSLayoutConstraint *nextQuestionLabelCenterXConstraint;
 
 @end
 
@@ -25,7 +28,14 @@
                       @"Blue. No, yel-" ];
     
     
-    self.questionLabel.text = self.questions[self.currentQuestionIndex];
+    self.currentQuestionLabel.text = self.questions[self.currentQuestionIndex];
+    
+    [self updateOffScreenLabel];
+}
+
+- (void)updateOffScreenLabel {
+    CGFloat screenWidth = self.view.frame.size.width;
+    self.nextQuestionLabelCenterXConstraint.constant = -screenWidth;
 }
 
 
@@ -35,7 +45,7 @@
         self.currentQuestionIndex = 0;
     }
     NSString *question = self.questions[self.currentQuestionIndex];
-    self.questionLabel.text = question;
+    self.nextQuestionLabel.text = question;
     self.answerLabel.text = @"???";
     [self animatedLabelTransitions];
 }
@@ -45,14 +55,39 @@
 }
 
 -(void)animatedLabelTransitions {
-    [UIView animateWithDuration:0.5 animations:^{
-        self.questionLabel.alpha = 1.0;
-    }];
+    
+    
+    CGFloat screenWidth = self.view.frame.size.width;
+    self.nextQuestionLabelCenterXConstraint.constant = 0;
+    self.currentQuestionLabelCenterXConstraint.constant += screenWidth;
+    
+    [UIView animateWithDuration:0.5
+                          delay:0.0
+                        options:0
+                     animations:^{
+                         self.currentQuestionLabel.alpha = 0.0;
+                         self.nextQuestionLabel.alpha = 1.0;
+                         [self.view layoutIfNeeded];
+                     }
+                     completion:^(BOOL finished) {
+                         UILabel *tempLabel = self.currentQuestionLabel;
+                         self.currentQuestionLabel = self.nextQuestionLabel;
+                         self.nextQuestionLabel = tempLabel;
+                         
+                         NSLayoutConstraint *tempConstraint =
+                         self.currentQuestionLabelCenterXConstraint;
+                         self.currentQuestionLabelCenterXConstraint = self.
+                         nextQuestionLabelCenterXConstraint;
+                         self.nextQuestionLabelCenterXConstraint = tempConstraint;
+                         [self updateOffScreenLabel];
+                         
+                         
+                     }];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    self.questionLabel.alpha = 0.0;
+    self.nextQuestionLabel.alpha = 0.0;
 }
 
 
