@@ -63,7 +63,7 @@
     
     [UIView animateWithDuration:0.5
                           delay:0.0
-                        options:0
+                        options:UIViewAnimationOptionCurveLinear
                      animations:^{
                          self.currentQuestionLabel.alpha = 0.0;
                          self.nextQuestionLabel.alpha = 1.0;
